@@ -1,11 +1,4 @@
-// 중심점을 찍고 원을 그리면 됨(반지름만 변하게)
-
-import {
-  resizeAspectRatio,
-  setupText,
-  updateText,
-  Axes,
-} from '../util/util.js';
+import { setupText, updateText, Axes } from '../util/util.js';
 import { Shader, readShaderFile } from '../util/shader.js';
 
 // Global variables
@@ -18,12 +11,12 @@ let positionBuffer; // 2D position을 위한 VBO (Vertex Buffer Object)
 let isDrawing = false; // mouse button을 누르고 있는 동안 true로 change
 let startPoint = null; // mouse button을 누른 위치
 let tempEndPoint = null; // mouse를 움직이는 동안의 위치
-let lines = []; // 그려진 선분들을 저장하는 array
+let lines = [];
 let intersectionPoints = [];
 let textOverlay; // 1st line segment 정보 표시
 let textOverlay2; // 2nd line segment 정보 표시
 let textOverlay3; // 3rd line segment 정보 표시
-let axes = new Axes(gl, 0.85); // x, y axes 그려주는 object (see util.js)
+let axes = new Axes(gl, 0.85); // x, y axes 그려주는 object
 
 document.addEventListener('DOMContentLoaded', () => {
   if (isInitialized) {
@@ -55,8 +48,6 @@ function initWebGL() {
   canvas.width = 700;
   canvas.height = 700;
 
-  resizeAspectRatio(gl, canvas);
-
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clearColor(0.1, 0.2, 0.3, 1.0);
 
@@ -84,35 +75,6 @@ function convertToWebGLCoordinates(x, y) {
     -((y / canvas.height) * 2 - 1), // y canvas 좌표는 상하를 뒤집어 주어야 하므로 -1을 곱함
   ];
 }
-
-/* 
-    browser window
-    +----------------------------------------+
-    | toolbar, address bar, etc.             |
-    +----------------------------------------+
-    | browser viewport (컨텐츠 표시 영역)       | 
-    | +------------------------------------+ |
-    | |                                    | |
-    | |    canvas                          | |
-    | |    +----------------+              | |
-    | |    |                |              | |
-    | |    |      *         |              | |
-    | |    |                |              | |
-    | |    +----------------+              | |
-    | |                                    | |
-    | +------------------------------------+ |
-    +----------------------------------------+
-
-    *: mouse click position
-
-    event.clientX = browser viewport 왼쪽 경계에서 마우스 클릭 위치까지의 거리
-    event.clientY = browser viewport 상단 경계에서 마우스 클릭 위치까지의 거리
-    rect.left = browser viewport 왼쪽 경계에서 canvas 왼쪽 경계까지의 거리
-    rect.top = browser viewport 상단 경계에서 canvas 상단 경계까지의 거리
-
-    x = event.clientX - rect.left  // canvas 내에서의 클릭 x 좌표
-    y = event.clientY - rect.top   // canvas 내에서의 클릭 y 좌표
-*/
 
 function setupMouseEvents() {
   function handleMouseDown(event) {
@@ -193,9 +155,7 @@ function setupMouseEvents() {
 
         let points = [];
 
-        if (D < 0) {
-          updateText(textOverlay3, 'No intersection');
-        } else if (D === 0) {
+        if (D == 0) {
           const t = -b / (2 * a);
 
           if (t >= 0 && t <= 1) {
@@ -203,7 +163,7 @@ function setupMouseEvents() {
             const y = y1 + t * dy;
             points.push([x, y]);
           }
-        } else {
+        } else if (D > 0) {
           const t1 = (-b - Math.sqrt(D)) / (2 * a);
           const t2 = (-b + Math.sqrt(D)) / (2 * a);
 
